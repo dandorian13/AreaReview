@@ -1,7 +1,12 @@
 #google geo api : AIzaSyBiUDxadU70wXZHE8e9dNYbdWmYSO4eHkI
+#google place review api : AIzaSyDEfgx-keEaRVhYX6rPUNF8QwNBkpyVv_g
+#google place reference:  AIzaSyBR9hsA0L7eNi5Nicgszt8eyvysLEL2mFo
+distanceApi = '&key=AIzaSyCIvK5zFEQ0nJpv5EKWG1tAhBLU_52_wL0'
+referenceAPI = 'AIzaSyBdGqqScqrz_KKxCPeTEjWOcxW5bbYYwXY'
+reviewAPIKey  = 'AIzaSyBR9hsA0L7eNi5Nicgszt8eyvysLEL2mFo'
+#-----------------------------------------------------------------------------------------------------------------------
 import requests
 import json
-distanceApi = '&key=AIzaSyCIvK5zFEQ0nJpv5EKWG1tAhBLU_52_wL0'
 #-----------------------------------------------------------------------------------------------------------------------
 
 geoURL = 'https://maps.googleapis.com/maps/api/geocode/json?address='
@@ -9,7 +14,12 @@ geoURL2 = '&key=AIzaSyBiUDxadU70wXZHE8e9dNYbdWmYSO4eHkI'
 crime1 =  'https://data.police.uk/api/crimes-street/all-crime?'
 distanceURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&'
 hospitalsURL = 'https://data.gov.uk/data/api/service/health/hospitals/nearest?'
+referenceURL = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
+reviewURL = 'https://maps.googleapis.com/maps/api/place/details/json?reference='
 
+
+#seperate the variables from the urls needed.
+#-----------------------------------------------------------------------------------------------------------------------
 rating_safety = 0
 rating_health = 0
 rating_education = 0
@@ -201,3 +211,27 @@ rating_health = rating_health - (average_distance / 10000)
 #print(rating_health)
 printLine()
 #===================================== HEALTH CARE - S T A T S - O V E R ===============================================
+
+#------------------------------------- REVIEW OF PLACE - S T A R T I N G -----------------------------------------------
+getReference = (str)(referenceURL)+ (str)(latitude)  + ',' + (str)(longitude) + '&radius=500' + '&key=' + (str)(referenceAPI)
+#got the actual url to get the reference, to json and parsing ahead.
+getReference = requests.get(getReference)
+getReference = getReference.json()
+referenceNum = getReference['results'][0]['reference']
+refIndex = 0
+rating = []
+i = 0
+for i in getReference['results']:
+    if('rating' in getReference['results'][refIndex]):
+        rating.append(getReference['results'][refIndex]['rating'])
+    refIndex += 1
+total = 0
+for i in rating:
+    total += i
+averageRating = total / len(rating)
+
+print('The average rating given by other people on the area is is %.3f .\n' % averageRating)
+#Got the average rating of users of that particular area of 500 m radius.
+
+#====================== R A T I N G - O F - A R E A - D O N E ==========================================================
+
