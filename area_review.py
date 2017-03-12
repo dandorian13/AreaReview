@@ -17,29 +17,25 @@ def forAddress(address):     #this one if for the address; changes the space to 
     return address.replace(' ', '+')
 
 def printLine():
-    print('-----------------------------------------------------------------------------------------------------------')
+    print('------------------------------------------------------------')
 #-------------------------- M A I N - S T A R T S - H E R E ------------------------------------------------------------
 printLine()
-print('Note: Date gives you the crime stats of that period. If ignored, gives you the crimes of the most recent\n\t' +
-      '  period')
-
-print('**\t  If you wish to ignore the date, just leave it blank(that is carriage return). Thank you\t**')
+printLine()
+print('NOTE: If date field is ignored, the data')
+print('\t  will be based on the most recent found.')
+printLine()
 printLine()
 date = input('Input the specific month and year YYYY/MM:')
 date = forDate(date)
 print(date)
-address = input('Enter your address seperated by comas: ')
+address = input('Enter your address seperated by commas: ')
 address = forAddress(address)
 totalGeo = geoURL + address + geoURL2 #total complete URL
 resultGeo = requests.get(totalGeo) #get the api request
 resultGeo = resultGeo.json()
-print(resultGeo)
+#print(resultGeo)
 location = resultGeo['results'][0]['geometry']['location']
 latitude, longitude = location['lat'], location['lng'] #got the latitude and longitude from geo api
-printLine()
-printLine()
-print (latitude, ' - ', longitude)
-printLine()
 #go the necessary info needed for the crime api. all ready to go now,yay!
 #--------------------- C R I M E - A P I - S T A R T S - N O W ---------------------------------------------------------
 
@@ -82,17 +78,28 @@ for category in category_counter:
         highestCrime = category
 
 no_suspects = 0
+under_investigation = 0
+
 for outcome in crime_outcomes:
     if 'no suspect' in str(outcome):
         no_suspects += 1
+    if 'Under investigation' in str(outcome):
+        under_investigation += 1
 #------------------- P R I N T - T H E - S T A T S ---------------------------------------------------------------------
 printLine()
-print('T H E - S T A T S')
+printLine()
+print('------------------YOUR SELECTED AREA STATS------------------')
+printLine()
+printLine()
 if highestCrime is not '':
-    print('The total number of crimes : ', len(crime_array))
-    print('The most frequest crime happening in your area is : ', highestCrime)
-    ratio = no_suspects / len(crime_array) * 100
-    print(ratio, '% of the total crimes finished without finding any suspect')
+    print('The total number of crimes in given area is %s.\n' % len(crime_array))
+    print('The most frequest crime happening in your area is %s.\n' % highestCrime)
+    #compute useful information
+    ratio_unsolved = no_suspects / len(crime_array) * 100
+    ratio_investigating = under_investigation / len(crime_array) * 100
+    ###########################
+    print('%.2f%%' % ratio_unsolved + ' of the total crimes finished without finding any suspect.\n')
+    print('%.2f%%' % ratio_investigating, ' of the total crimes are still under investigation.')
 else:
     print('No crimes could be found at given location')
 printLine()
