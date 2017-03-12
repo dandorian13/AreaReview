@@ -8,6 +8,10 @@ geoURL = 'https://maps.googleapis.com/maps/api/geocode/json?address='
 geoURL2 = '&key=AIzaSyBiUDxadU70wXZHE8e9dNYbdWmYSO4eHkI'
 crime1 =  'https://data.police.uk/api/crimes-street/all-crime?'
 
+rating_safety = 0
+rating_health = 0
+rating_education = 0
+
 #-----------------------------------------------------------------------------------------------------------------------
 
 def forDate(date):     #this method used for the string date thingy.
@@ -38,12 +42,9 @@ location = resultGeo['results'][0]['geometry']['location']
 latitude, longitude = location['lat'], location['lng'] #got the latitude and longitude from geo api
 #go the necessary info needed for the crime api. all ready to go now,yay!
 #--------------------- C R I M E - A P I - S T A R T S - N O W ---------------------------------------------------------
-
-if(date is ''):
-    total_CrimeURL =  str(crime1) + 'lat=' + str(latitude) + '&lng=' + str(longitude)
-else:
-    total_CrimeURL = str(crime1) + 'lat=' + str(latitude) + '&lng=' + str(longitude) + \
-                 '&date=' + str(date)
+total_CrimeURL =  str(crime1) + 'lat=' + str(latitude) + '&lng=' + str(longitude)
+if(date is not ''):
+    total_CrimeURL = total_CrimeURL + '&date=' + str(date)
 
 result = requests.get(total_CrimeURL)
 result = result.json()
@@ -79,7 +80,7 @@ for category in category_counter:
 
 no_suspects = 0
 under_investigation = 0
-
+solved_crimes = 0
 for outcome in crime_outcomes:
     if 'no suspect' in str(outcome):
         no_suspects += 1
@@ -88,7 +89,7 @@ for outcome in crime_outcomes:
 #------------------- P R I N T - T H E - S T A T S ---------------------------------------------------------------------
 printLine()
 printLine()
-print('------------------YOUR SELECTED AREA STATS------------------')
+print('---------------YOUR SELECTED CRIME AREA STATS---------------')
 printLine()
 printLine()
 if highestCrime is not '':
@@ -97,6 +98,14 @@ if highestCrime is not '':
     #compute useful information
     ratio_unsolved = no_suspects / len(crime_array) * 100
     ratio_investigating = under_investigation / len(crime_array) * 100
+    solved_crimes = 100 - ratio_unsolved - ratio_investigating
+    rating_safety = int(solved_crimes)
+    rating_safety = float(rating_safety) / 10
+    #print(rating_safety)
+    if(rating_safety > 5):
+        rating_safety = 5
+    if(rating_safety < 0):
+        rating_safety = 0
     ###########################
     print('%.2f%%' % ratio_unsolved + ' of the total crimes finished without finding any suspect.\n')
     print('%.2f%%' % ratio_investigating, ' of the total crimes are still under investigation.')
