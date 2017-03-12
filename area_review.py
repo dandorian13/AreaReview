@@ -199,4 +199,5 @@ print('The average distance between the nearest three hospitals to the given loc
 rating_health = 6 - (hospitals_distance[nearest_index] / 1000)
 rating_health = rating_health - (average_distance / 10000)
 #print(rating_health)
+printLine()
 #===================================== HEALTH CARE - S T A T S - O V E R ===============================================
