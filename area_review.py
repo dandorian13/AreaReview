@@ -1,12 +1,14 @@
 #google geo api : AIzaSyBiUDxadU70wXZHE8e9dNYbdWmYSO4eHkI
 import requests
-import urllib.request
 import json
+distanceApi = '&key=AIzaSyCIvK5zFEQ0nJpv5EKWG1tAhBLU_52_wL0'
 #-----------------------------------------------------------------------------------------------------------------------
 
 geoURL = 'https://maps.googleapis.com/maps/api/geocode/json?address='
 geoURL2 = '&key=AIzaSyBiUDxadU70wXZHE8e9dNYbdWmYSO4eHkI'
 crime1 =  'https://data.police.uk/api/crimes-street/all-crime?'
+distanceURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&'
+hospitalsURL = 'https://data.gov.uk/data/api/service/health/hospitals/nearest?'
 
 rating_safety = 0
 rating_health = 0
@@ -111,5 +113,90 @@ if highestCrime is not '':
     print('%.2f%%' % ratio_investigating, ' of the total crimes are still under investigation.')
 else:
     print('No crimes could be found at given location')
-printLine()
+    rating_safety = 5
 #===================================== C R I M E - S T A T S - O V E R =================================================
+#=====================================HEALTH INFO STARTING==============================================================
+printLine()
+printLine()
+print('-------------YOUR SELECTED HEALTHCARE AREA STATS------------')
+printLine()
+printLine()
+
+hospitalGet = requests.get((str)(hospitalsURL) + 'lat=' + (str)(latitude) + '&lon=' + (str)(longitude))
+hospitalGet = hospitalGet.json()
+
+arrayPostCode = []
+arrayLat = []
+arrayLon = []
+hosIndex = 0
+tempIndex = 0
+
+print('The closest hospitals near the given address are :')
+for i1 in hospitalGet['result'][hosIndex]:
+     if(tempIndex == 3):
+        break
+     else:
+         print('\t\t',hospitalGet['result'][hosIndex]['name'])
+         arrayPostCode.append(hospitalGet['result'][hosIndex]['postcode'])
+         tempIndex += 1
+         hosIndex += 1
+
+print()
+#-----------------------------------------------------------------------------------------------------------------------
+#got the nearest hospitals and the post code, now find the latitude and longitudes of them and store in array:
+ind = 0
+for i in arrayPostCode:
+    address = forAddress(arrayPostCode[ind])
+    totalGeo = geoURL + address + geoURL2  # total complete URL
+    resultGeo = requests.get(totalGeo)  # get the api request
+    resultGeo = resultGeo.json()
+    temp = requests.get(geoURL + i + geoURL2)
+    temp = temp.json()
+    tempLocation = resultGeo['results'][0]['geometry']['location']
+    arrayLat.append(tempLocation['lat'])
+    arrayLon.append(tempLocation['lng'])
+    ind += 1
+
+index = 0
+hospitals_json = []
+hospitals_distance = []
+hospitals_distance_text = []
+
+while (index < 3):
+    distance_origin = 'origins=' + (str)(latitude) + ',' + (str)(longitude) + '&'
+    distance_destination = 'destinations=' + (str)(arrayLat[index]) + ',' + (str)(arrayLon[index]) + distanceApi
+    totalDistance = distanceURL + distance_origin + distance_destination
+    #print(totalDistance)
+    resultDistance = requests.get(totalDistance) #get the api request
+    resultDistance = resultDistance.json()
+    hospitals_json.append(resultDistance)
+    index += 1
+
+#print(resultDistance)
+index = 0
+while (index < 3):
+    hospitals_distance.append(hospitals_json[index]['rows'][0]['elements'][0]['distance']['value'])
+    hospitals_distance_text.append(hospitals_json[index]['rows'][0]['elements'][0]['distance']['text'])
+
+    index += 1
+
+nearest_index = 0
+nearest_hospital_distance = hospitals_distance[0]
+
+if(nearest_hospital_distance > hospitals_distance[1]):
+    nearest_hospital_distance = hospitals_distance[1]
+    nearest_index = 1
+
+if(nearest_hospital_distance > hospitals_distance[2]):
+    nearest_hospital_distance = hospitals_distance[2]
+    nearest_index = 2
+
+print('The distance to the nearest hospital is %s.\n' % hospitals_distance_text[nearest_index])
+
+average_distance = (hospitals_distance[0] + hospitals_distance[1] + hospitals_distance[2]) / 3.0
+print('The average distance between the nearest three hospitals to the given location is %.2f meters.\n' % average_distance)
+
+rating_health = 6 - (hospitals_distance[nearest_index] / 1000)
+rating_health = rating_health - (average_distance / 10000)
+#print(rating_health)
+#===================================== HEALTH CARE - S T A T S - O V E R ===============================================
