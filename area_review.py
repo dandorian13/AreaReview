@@ -3,7 +3,8 @@
 #google place reference:  AIzaSyBR9hsA0L7eNi5Nicgszt8eyvysLEL2mFo
 distanceApi = '&key=AIzaSyCIvK5zFEQ0nJpv5EKWG1tAhBLU_52_wL0'
 referenceAPI = 'AIzaSyBdGqqScqrz_KKxCPeTEjWOcxW5bbYYwXY'
-reviewAPIKey  = 'AIzaSyBR9hsA0L7eNi5Nicgszt8eyvysLEL2mFo'
+reviewAPIKey = 'AIzaSyBR9hsA0L7eNi5Nicgszt8eyvysLEL2mFo'
+airportAPIKey = 'AIzaSyAu-knOMCv8nEGcTusCA9NOPo-Z7d0EwCs'
 #-----------------------------------------------------------------------------------------------------------------------
 import requests
 import json
@@ -16,6 +17,8 @@ distanceURL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=me
 hospitalsURL = 'https://data.gov.uk/data/api/service/health/hospitals/nearest?'
 referenceURL = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='
 reviewURL = 'https://maps.googleapis.com/maps/api/place/details/json?reference='
+nearAirport =  'http://maps.googleapis.com/maps/api/geocode/json?address=airport%20'
+airportDist = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='
 
 
 #seperate the variables from the urls needed.
@@ -49,7 +52,6 @@ address = forAddress(address)
 totalGeo = geoURL + address + geoURL2 #total complete URL
 resultGeo = requests.get(totalGeo) #get the api request
 resultGeo = resultGeo.json()
-#print(resultGeo)
 location = resultGeo['results'][0]['geometry']['location']
 latitude, longitude = location['lat'], location['lng'] #got the latitude and longitude from geo api
 #go the necessary info needed for the crime api. all ready to go now,yay!
@@ -234,4 +236,22 @@ print('The average rating given by other people on the area is is %.3f .\n' % av
 #Got the average rating of users of that particular area of 500 m radius.
 
 #====================== R A T I N G - O F - A R E A - D O N E ==========================================================
+#======================= A I R - P O R T - N E A R - B Y ===============================================================
+post_code = input('Enter your postal code : ')
+getNearAirPort = nearAirport + (str)(post_code) + '&sensor=false'
+getNearAirPort = requests.get(getNearAirPort)
+getNearAirPort = getNearAirPort.json()
+airportLat = getNearAirPort['results'][0]['geometry']['location']['lat']
+airportLon= getNearAirPort['results'][0]['geometry']['location']['lng']
 
+print(airportLat)
+getDistanceToAirPort = airportDist + (str)(latitude) + ',' + (str)(longitude) + '&destinations=' + (str)(airportLat) + \
+                        ',' + (str)(airportLon) + '&key=' + (str)(airportAPIKey)
+getDistanceToAirPort = requests.get(getDistanceToAirPort)
+getDistanceToAirPort = getDistanceToAirPort.json()
+print(getDistanceToAirPort)
+distance = getDistanceToAirPort['rows'][0]['elements'][0]['distance']['text']
+duration = getDistanceToAirPort['rows'][0]['elements'][0]['duration']['text']
+print(distance)
+print(duration)
+#------------------------------ DISTANCE OF AIRPORT AND DURATION - DONE ------------------------------------------------
