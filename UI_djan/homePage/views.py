@@ -21,11 +21,10 @@ def home(request):
 @csrf_exempt
 def result(request):
     if(request.method == 'POST'):
-            # datafromclient = request.form['mydata']
-            # finalRes = runAreaReview(datafromclient)
-             test = 'testing'
-             return HttpResponse('lmnop')
-
+            datafromclient = request.POST['mydata']
+            print(datafromclient)
+            finalRes = runAreaReview(datafromclient)
+            return HttpResponse(finalRes)
 
 
 

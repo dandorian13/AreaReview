@@ -45,6 +45,7 @@ function callpy(input){
     var pyres = $.ajax({
         type: "POST",
         url:'/result',
+        async: false,
         data: { mydata: input }
     });
     return pyres.responseText;
