@@ -1,6 +1,5 @@
- var info = document.getElementById("testInfo");
- var btn = document.getElementById("homeBtn");
-
+var btn = document.getElementById("homeBtn");
+var info = document.getElementById("printResult");
 // var pageCounter = 1;
 // btn.addEventListener('click', function(){
 //     var ourRequest = new XMLHttpRequest();
@@ -37,16 +36,18 @@ btn.addEventListener('click', function(){
         console.log('you failed');
     else
         // console.log(btnres);
-        var result = callpy(btnres);
-        console.log(result)
-
+       var info = document.getElementById("printResult");
+       var result =  callpy(btnres);
+       info.insertAdjacentHTML('beforeend',result);
 });
+
 function callpy(input){
     var pyres = $.ajax({
         type: "POST",
         url:'/result',
-        async: false,
+        async: false,  //don't change this line of code.
         data: { mydata: input }
     });
-    return pyres.responseText;
+    return pyres.responseText
+
 }

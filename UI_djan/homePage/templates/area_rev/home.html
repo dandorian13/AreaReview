@@ -16,13 +16,12 @@
     <hr/>
     <br>
     <div align="center" class="input-line">
-         <form class="input-form" method="post">{% csrf_token %}
             <input type = "text" id = "ans" class = "form-control" name = "address" placeholder="Type postcode..."><br><br>
             <button id = "homeBtn" class="btn btn-primary">Find info</button><br><br>
-         </form>
     </div>
     <div id="testInfo"></div>
-<script type="text/javascript" src="{% static 'js/mainHome.js' %}"></script>
+    <div id = 'printResult'> </div>
+   <script type="text/javascript" src="{% static 'js/mainHome.js' %}"></script>
 </body>
 </html>
 
