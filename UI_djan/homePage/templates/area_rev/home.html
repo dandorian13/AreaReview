@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Area Review</title>
+	<meta charset="utf-8" />
+	{% load staticfiles %}
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type = "text/css"/>
+	<meta name="viewport" content = "width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'img/home.png.png'%}">
+    <link rel="stylesheet" href="{% static 'css/mainpage.css' %}" type="text/css"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <title>Home page</title>
+</head>
+<body>
+    <h1>AreaReview</h1>
+    <hr/>
+    <br>
+    <div align="center" class="input-line">
+         <form class="input-form" method="post">{% csrf_token %}
+            <input type = "text" id = "ans" class = "form-control" name = "address" placeholder="Type postcode..."><br><br>
+            <button id = "homeBtn" class="btn btn-primary">Find info</button><br><br>
+         </form>
+    </div>
+    <div id="testInfo"></div>
+<script type="text/javascript" src="{% static 'js/mainHome.js' %}"></script>
+</body>
+</html>
+
